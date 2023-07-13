@@ -6,7 +6,7 @@ import { CreateNewToDo } from './components/CreateNewToDo';
 import { ToDoItem } from './components/ToDoItem';
 import { NewTask } from './components/NewTask';
 
-
+/*
 const defaultToDo =[
   {text: 'Cortar cebolla', completed : true, id:1},
   {text: 'Hacer un curso', completed : false, id:2},
@@ -15,9 +15,35 @@ const defaultToDo =[
   {text: 'OTRA cebolla', completed : true, id:5}
 ]
 
+localStorage.setItem('TODOS_V1',JSON.stringify(defaultToDo));*/
+//localStorage.removeItem('TODOS_V1');
+
+//Customer hook
+function useLocalStorage(itemName, initialState){
+  
+  const localStorageItem = localStorage.getItem(itemName); // Traemos el string desde el localStorage
+  let parsedItem;
+  
+  if(!localStorageItem){
+    localStorage.setItem(itemName,JSON.stringify(initialState));//Seteamos el array vació como string
+    parsedItem = initialState;//Si el localstorage esta vació, generamos un arreglo sin nada
+  }else{
+    parsedItem = JSON.parse(localStorageItem);
+  };
+  
+  const [item,setItems] = React.useState(parsedItem);
+  const saveItem = (newItem) =>{
+    localStorage.setItem('TODOS_V1',JSON.stringify(newItem));
+    setItems(newItem)
+  };
+
+  return [item,saveItem];
+}
+
 function App() {
+
+  const [todos,saveItems] = useLocalStorage('TODOS_V1',[]); // Arreglo vació.
   const [searchValue, setSearchValue] = React.useState(''); // Declaramos un estado de la variable searchValue por defecto con React.useState(''); Para que este campo este vació
-  const [todos,setTodos] = React.useState(defaultToDo); // Arreglo vació.
 
   const completedToDos = todos.filter(todos => !!todos.completed).length; // !! sirve para convertir la response en boolean.
   const totalToDos = todos.length ; // Total de to-dos 
@@ -26,7 +52,7 @@ function App() {
     const todoText = todo.text.toLowerCase(); // Cambiamos todo el text del arreglo a minuscula
     const todoSearch = searchValue.toLowerCase();//Cambiamos el texto buscado a minuscula
     return todoText.includes(todoSearch); // Buscamos y devolvemos el texto buscado dentro del arreglo.
-  })//Buscar en base al search
+  });//Buscar en base al search
 
   const changeStatusToDo = (id)=>{
     console.log('cambie')
@@ -36,13 +62,13 @@ function App() {
           list.completed = !list.completed;
         }
       });
-      setTodos(newListToDo)
+      saveItems(newListToDo)
   }
 
   const onDelete = (id)=>{
     console.log('cambie')
     const newListToDo = [...todos];//Copiamos el array principal
-    setTodos(newListToDo.filter(list => list.id !== id))
+    saveItems(newListToDo.filter(list => list.id !== id))
   }
 
   return (
