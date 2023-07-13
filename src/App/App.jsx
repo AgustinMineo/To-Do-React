@@ -8,7 +8,11 @@ import { useLocalStorage } from './useLocalStorage';
 
 function App() {
 
-const [todos,saveItems] = useLocalStorage('TODOS_V1',[]); // Arreglo vació.
+const {
+  item: todos,
+  saveItems,
+  error,
+  loading} = useLocalStorage('TODOS_V1',[]); // Arreglo vació.
 const [searchValue, setSearchValue] = React.useState(''); // Declaramos un estado de la variable searchValue por defecto con React.useState(''); Para que este campo este vació
 
 const completedToDos = todos.filter(todos => !!todos.completed).length; // !! sirve para convertir la response en boolean.
@@ -51,6 +55,10 @@ const onDelete = (id)=>{
         <div className="col-6">
         <TodoCounter completed={completedToDos} total={totalToDos} searchValue={searchValue} setSearchValue={setSearchValue} />
           <TodoList>
+            {loading && <p>We´re loading the information....</p>}
+            {error && <p>Error loading the to-do list</p>}
+            {(!loading && !error) && <p>You dont have any to-do</p>}
+
           {seachActualToDo.map(todo => (
             <ToDoItem key={todo.id} 
             text={todo.text} 
